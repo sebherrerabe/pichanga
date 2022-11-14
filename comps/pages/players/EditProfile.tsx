@@ -1,6 +1,10 @@
 import { Dispatch, FC, FormEvent, SetStateAction, useState } from "react";
-import { ISessionUser, ITeam, IUser } from "../../types";
-import { useGetData, usePatchData } from "../../hooks/queries/apiHooks";
+import { ICloudinaryResponse, ISessionUser, ITeam, IUser } from "../../types";
+import {
+  useGetData,
+  usePatchData,
+  usePostData,
+} from "../../hooks/queries/apiHooks";
 
 import ComingFromDownContainer from "../../ui/ComingFromDownContainer";
 import InputField from "../../forms/InputField";
@@ -61,6 +65,19 @@ const EditProfile: FC<Props> = ({ user, editMode, setEditMode }) => {
       ...formData,
       profile: { ...profile, [e.target.name]: e.target.value },
     });
+
+  const { mutate: uploadPhoto, isLoading: isPhotoLoading } = usePostData<
+    ICloudinaryResponse,
+    FormData
+  >({
+    url: "https://api.cloudinary.com/v1_1/sebherrerabe/image/upload",
+    onSuccess: (data) =>
+      setFormData({
+        ...formData,
+        profile: { ...profile, userPic: data.url },
+      }),
+  });
+
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     updateUser(formData);
@@ -84,7 +101,11 @@ const EditProfile: FC<Props> = ({ user, editMode, setEditMode }) => {
       title="Edit profile"
     >
       <div className="flex w-full flex-col items-center justify-center">
-        <UploadPicture imageUrl={userPic} />
+        <UploadPicture
+          imageUrl={userPic}
+          uploadPhoto={uploadPhoto}
+          isLoading={isPhotoLoading}
+        />
       </div>
       <form onSubmit={onSubmit}>
         <InputField
