@@ -7,6 +7,7 @@ import InputField from "../../forms/InputField";
 import PositionSelectField from "./PositionSelectField";
 import SelectField from "../../forms/SelectField";
 import TextAreaInputField from "../../forms/TextAreaInputField";
+import UploadPicture from "../../ui/UploadPicture";
 import countries from "../../data/countries.json";
 import { queryClient } from "../../hooks/queries/queryClient";
 import { useSession } from "next-auth/react";
@@ -20,7 +21,7 @@ interface Props {
 const EditProfile: FC<Props> = ({ user, editMode, setEditMode }) => {
   const { token } = (useSession().data?.user as ISessionUser) || {};
   const [formData, setFormData] = useState<IUser>(user);
-  const { username, profile, mainTeam, teams, id } = formData;
+  const { profile, mainTeam, teams, id } = formData;
   const {
     bio,
     displayName,
@@ -51,8 +52,6 @@ const EditProfile: FC<Props> = ({ user, editMode, setEditMode }) => {
     },
   });
 
-  const userOnChange = (e: React.ChangeEvent<HTMLInputElement>) =>
-    setFormData({ ...formData, [e.target.name]: e.target.value });
   const profileOnChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
@@ -85,24 +84,9 @@ const EditProfile: FC<Props> = ({ user, editMode, setEditMode }) => {
       title="Edit profile"
     >
       <div className="flex w-full flex-col items-center justify-center">
-        <div
-          className="h-28 w-28 rounded-full bg-gray-600 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${userPic})` }}
-        ></div>
-        <button className="mt-4 text-lg font-semibold text-blue-700">
-          Change profile picture
-        </button>
+        <UploadPicture imageUrl={userPic} />
       </div>
       <form onSubmit={onSubmit}>
-        <InputField
-          id="username"
-          name="username"
-          labelName="Username"
-          value={username}
-          onChange={userOnChange}
-          inputClassName="bg-gray-200 p-3 rounded-xl mt-2"
-          isRequired
-        />
         <InputField
           id="displayName"
           name="displayName"
